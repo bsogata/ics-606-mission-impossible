@@ -17,7 +17,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	  private JFrame window;
 	  private JPanel leftPane;
 	  private JPanel rightPane;
-	  private JTextArea output;
+	  //private JTextArea output;
 	  private JSlider speedSlider;
 	  private int animationDelay;
 	  private JButton goButton;
@@ -50,13 +50,13 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    rightPane.setLayout(new BoxLayout(rightPane, BoxLayout.PAGE_AXIS));
 
 		    //output: for displaying move output
-		    this.output = new JTextArea("MOVES:\n", 10, 25);
-		    output.setEditable(false);
-		    output.setTabSize(2);
+		   // this.output = new JTextArea("MOVES:\n", 10, 25);
+		  //  output.setEditable(false);
+		  //  output.setTabSize(2);
 		    //wrap it in a scroll pane as adding it so it'll scroll
-		    rightPane.add(new JScrollPane(output,
-		                                  JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-		                                  JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		   // rightPane.add(new JScrollPane(output,
+		    //                              JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		    //                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 		    //slider
 		    this.speedSlider = new JSlider(0, 1000, 200);  //low, high, initial
@@ -154,17 +154,17 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		            Thread.sleep(this.animationDelay);
 		          }
 		          //update output, scrolling down the text if necessary
-		          this.output.append(room.getStatus());
-		          this.output.setCaretPosition(this.output.getText().length());
+		        //  this.output.append(room.getStatus());
+		        //  this.output.setCaretPosition(this.output.getText().length());
 		        }catch (InterruptedException ie) {
 		          //shouldn't ever happen.
 		          //(If it ever does, probably want to now about it though, so tell console)
 		          System.out.println("Board sleep interrupted! Continuing to animate though...");
 		        }
 		      }
-		      this.output.append(room.getStatus(true) + "\n");  //print last move
-		      this.output.append(room.getStatus());             //result
-		      this.output.setCaretPosition(this.output.getText().length()); //force scroll
+		    //  this.output.append(room.getStatus(true) + "\n");  //print last move
+		     // this.output.append(room.getStatus());             //result
+		     // this.output.setCaretPosition(this.output.getText().length()); //force scroll
 		    }
 		    this.goButton.setText("Again!");
 		    this.goButton.setEnabled(true);  //enable cleaning and loading again
@@ -197,7 +197,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 
 	      //clear left pane and load with new room
 	      this.leftPane.removeAll();        //remove load label or room
-	      this.output.setText("MOVES:\n");  //reset output
+	    //  this.output.setText("MOVES:\n");  //reset output
 	      /*
 	       * FIX: setting the roomGUI's preferredSize to that of its parent pane
 	       * works well on initial load, but still doesn't handle window resizes.

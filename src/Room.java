@@ -166,7 +166,8 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		          if (room[row][col] == Room.DIRT) {
 		            square.setBackground(new Color(0xFF, 0xFF, 0x99));
 		          }else if (room[row][col] == Room.STUDENT) {
-		            square.setBackground(new Color(0xCC, 0xCC, 0xCC));
+		           // square.setBackground(new Color(0xCC, 0xCC, 0xCC));
+		        	  square.setBackground(Color.white);
 		          }else {
 		            square.setBackground(Color.white);
 		          }
@@ -186,15 +187,15 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		          if (room[row][col] == Room.STUDENT) {
 		            //darken the color of this square if necessary
 		            Color color = guiMap[row][col].getBackground();
-		            if (color.getRed() > 0) {
+		          //  if (color.getRed() > 0) {
 		              //darken, keeping in grey scale
-		              int darker = color.getRed() - 0x33;
-		              color = new Color(darker, darker, darker);
-		              guiMap[row][col].setBackground(color);
-		              if (darker < 0x66) {
-		                guiMap[row][col].setForeground(Color.white);
-		              }
-		            }
+		              //int darker = color.getRed() - 0x33;
+		             // color = new Color(darker, darker, darker);
+		             // guiMap[row][col].setBackground(color);
+		             // if (darker < 0x66) {
+		               // guiMap[row][col].setForeground(Color.white);
+		             // }
+		          //  }
 		          }
 		        }
 		      }
