@@ -1,12 +1,35 @@
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
- 
-
+/**
+ * The executable class for the program.
+ * 
+ * Credit to Zach Tomaszewski as the original author of portions of this code.
+ * 
+ * @author Jack Lam
+ * @author Branden Ogata
+ *
+ */
 
 public class AgentRunner implements ActionListener, ChangeListener {
 	
@@ -31,6 +54,10 @@ public class AgentRunner implements ActionListener, ChangeListener {
 
 	}
 
+	/**
+	 * Creates the GUI for this application.
+	 * 
+	 */
 	
 	 public AgentRunner() {
 		    //create a window
@@ -110,11 +137,25 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    window.setVisible(true);
 		  }
 	
+	 /**
+	  * Handles any changes to the speed slider.
+	  * 
+	  * @param e    The ChangeEvent that recorded the change.
+	  * 
+	  */
+	 
 	public void stateChanged(ChangeEvent e) {
 		 if (e.getSource() == this.speedSlider) {
 		      this.animationDelay = this.speedSlider.getValue();
 		    }		
 	}
+	
+	/**
+	 * Handles a variety of different actions such as menu selection and button clicking.
+	 * 
+	 * @param ae    The ActionEvent that recorded the action.
+	 * 
+	 */
 
 	public void actionPerformed(ActionEvent ae) {
 	    //determine which component generate this action, and respond accordingly
@@ -140,6 +181,11 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	      t.start();
 	    }
 	}
+	
+	/**
+	 * Cleans the Room shown in the GUI.
+	 * 
+	 */
 	
 	 public void clean() {
 		    if (this.room == null || this.roomGUI == null || this.room.getResult() != null) {
@@ -171,6 +217,11 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    this.load.setEnabled(true);
 		  }
 	
+	 /**
+	  * Loads a new Room.
+	  * 
+	  */
+	 
 	public void loadNewRoom() {
 	    //try opening the rooms subdirectory, if it exists; otherwise, current dir
 	    File startingDir = new File("rooms");
@@ -187,6 +238,11 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	      this.goButton.setText("Go");
 	    }
 	  }
+	
+	/**
+	 * Refreshes the Room.
+	 * 
+	 */
 	
 	protected void refreshRoom() {
 	   // try {

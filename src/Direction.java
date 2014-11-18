@@ -1,11 +1,25 @@
+/**
+ * The various directions to travel in this simulation.
+ * 
+ * Credit to Zach Tomaszewski as the original author of portions of this code.
+ * 
+ * @author Jack Lam
+ * @author Branden Ogata
+ *
+ */
 
 public enum Direction {
   N, NE, E, SE, S, SW, W, NW, HERE;
 
   /**
-   * Returns the X/column change on the screen that is associated with
-   * this direction: -1 for W, 0 for N/S, and +1 for E.
+   * Returns the X/column change on the screen that is associated with this Direction.
+   * 
+   * -1 for W, 0 for N/S, and +1 for E.
+   * 
+   * @return An int equal to the change in X from moving in this Direction.
+   * 
    */
+  
   public int getColModifier() {
     int mod;
     switch (this) {
@@ -27,9 +41,14 @@ public enum Direction {
   }
 
   /**
-   * Returns the Y/row change on the screen that is associated with
-   * this direction: -1 for N, 0 for E/W, and +1 for south.
+   * Returns the Y/row change on the screen that is associated with this direction.
+   * 
+   * -1 for N, 0 for E/W, and +1 for south.
+   * 
+   * @return An int equal to the change in Y from moving in this Direction.
+   * 
    */
+  
   public int getRowModifier() {
     int mod;
     switch (this) {
@@ -60,7 +79,13 @@ public enum Direction {
     return this.getRowModifier();
   }
 
-
+  /**
+   * Returns the Direction opposite of this Direction.
+   * 
+   * @return A Direction in the opposite Direction of this Direction.
+   * 
+   */
+  
   public Direction reverse() {
     if (this == HERE) {
       return this;

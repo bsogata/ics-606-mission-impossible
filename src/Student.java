@@ -6,6 +6,14 @@
  import jade.core.Agent;
 import jade.core.behaviours.*;
      
+/**
+ * A simple student agent.
+ * 
+ * @author Jack Lam
+ * @author Branden Ogata
+ *
+ */
+
  public class Student extends Agent 
  {       
      protected void setup() 

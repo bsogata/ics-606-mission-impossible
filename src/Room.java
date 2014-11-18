@@ -4,11 +4,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+/**
+ * The environment for agents to act in.
+ * 
+ * Credit to Zach Tomaszewski as the original author of portions of this code.
+ * 
+ * @author Jack Lam
+ * @author Branden Ogata
+ *
+ */
 
 public class Room {
 
@@ -38,6 +46,13 @@ public class Room {
 	  private int agentRow;  //current agent location on room map,
 	  private int agentCol;  // where top-left square of Room is (0,0)
 
+	  /**
+	   * Creates a new default Room with a single Student inside.
+	   * 
+	   * @param v    The Student to place inside the new Room.
+	   * 
+	   */
+	  
 	  public Room(Student v) {
 		roomHeight = 10;
 		roomWidth = 10;
@@ -59,10 +74,32 @@ public class Room {
 		room[1][1] = STUDENT;
 		this.agent = v;
 	}
+	  
+	  /**
+	   * Creates a new Room with the given character map and Student.
+	   * 
+	   * @param map The char[][] containing the map.
+	   * @param v   The Student to place on the map.
+	   * 
+	   * @throws InvalidMapException when the map is invalid.
+	   * 
+	   */
+	  
 	  public Room(char[][] map, Student v) throws InvalidMapException {
 		    this.loadMap(map);
 		    this.agent = v;
 		  }
+	  
+	  /**
+	   * Creates a new Room with the given map file and Student.
+	   * 
+	   * @param mapFilename    The String containing the name of the map file to load.
+	   * @param v              The Student to place on the map.
+	   * 
+	   * @throws FileNotFoundException when the input file could not be found.
+	   * @throws InvalidMapException   when the map in the input file is not valid.
+	   * 
+	   */
 	  
 	  public Room(String mapFilename, Student v) throws FileNotFoundException,
       InvalidMapException {
@@ -97,6 +134,14 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 }
 	  
 	  
+	  /**
+	   * Loads a map into this Room.
+	   * 
+	   * @param map    The char[][] containing the map to load.
+	   * 
+	   * @throws InvalidMapException when the map is invalid.
+	   * 
+	   */
 	  
 	  private void loadMap(char[][] map) throws InvalidMapException {
 		    //get and check room dimensions
@@ -147,7 +192,15 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		    }
 	  }
 
-
+  /**
+   * The GUI representation of this Room.
+   *  
+   * Credit to Zach Tomaszewski as the original author of portions of this code.
+   * 
+   * @author Jack Lam
+   * @author Branden Ogata
+   *
+   */
 
 	public class GUI extends JPanel {
 
@@ -203,7 +256,7 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		  }
 	  
 	  
-
+// TODO: Everything below needs to be modified from the original vacuum behaviors
 
 	public boolean moveAgent() {
 		 //first, construct a snapshot of the agent's surroundings
