@@ -1,4 +1,4 @@
-package agent;
+
 
 /**
  * The template for non-JADE agents.

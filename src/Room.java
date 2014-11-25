@@ -26,6 +26,7 @@ public class Room {
 	  public static final char DROP = '^';
 	  public static final char STUDENT = 'S';
 	  public static final char DIRT = '.';
+	  public static final char ENTRANCE = 'E';
 	  
 	  
 	  private int moves = 0;   //state regarding the Agent's recent activities
@@ -45,35 +46,11 @@ public class Room {
 	  private Student agent; //agent stuff
 	  private int agentRow;  //current agent location on room map,
 	  private int agentCol;  // where top-left square of Room is (0,0)
-
-	  /**
-	   * Creates a new default Room with a single Student inside.
-	   * 
-	   * @param v    The Student to place inside the new Room.
-	   * 
-	   */
 	  
-	  public Room(Student v) {
-		roomHeight = 10;
-		roomWidth = 10;
-		room = new char[roomHeight][roomWidth];
-		for(int i =0; i< roomHeight; i++){
-			room[0][i] = WALL;
-			room[i][0] = WALL;
-			room[roomHeight-1][i] = WALL;
-			room[i][roomWidth-1] = WALL;
-		}
-		
-		for(int i=1; i< roomHeight-1; i++){
-			for(int j = 1; j <roomWidth-1; j++){
-				room[i][j] = FLOOR;
-				
-			}
-		}
-		
-		room[1][1] = STUDENT;
-		this.agent = v;
-	}
+	  private ArrayList<Student> agents;
+	  private ArrayList<RoomAgentInfo> agentInfoList;
+
+
 	  
 	  /**
 	   * Creates a new Room with the given character map and Student.
@@ -94,44 +71,44 @@ public class Room {
 	   * Creates a new Room with the given map file and Student.
 	   * 
 	   * @param mapFilename    The String containing the name of the map file to load.
-	   * @param v              The Student to place on the map.
+	   * @param v              The Students to place on the map.
 	   * 
 	   * @throws FileNotFoundException when the input file could not be found.
 	   * @throws InvalidMapException   when the map in the input file is not valid.
 	   * 
 	   */
 	  
-	  public Room(String mapFilename, Student v) throws FileNotFoundException,
-      InvalidMapException {
+	  public Room(String mapFilename, ArrayList<Student> v) throws FileNotFoundException,
+	  InvalidMapException {
 
-try
-{
-// Open file to read
-Scanner filein = new Scanner(new File(mapFilename));
+		  try
+		  {
+			  // Open file to read
+			  Scanner filein = new Scanner(new File(mapFilename));
 
-// Read in file to ArrayList
-ArrayList<String> contents = new ArrayList<String>();
-while (filein.hasNextLine())
-{
-contents.add(filein.nextLine());
-}
+			  // Read in file to ArrayList
+			  ArrayList<String> contents = new ArrayList<String>();
+			  while (filein.hasNextLine())
+			  {
+				  contents.add(filein.nextLine());
+			  }
 
-char[][] map = new char[contents.size()][];
-for (int i = 0; i < contents.size(); i++) {
-map[i] = contents.get(i).toCharArray();
-}
+			  char[][] map = new char[contents.size()][];
+			  for (int i = 0; i < contents.size(); i++) {
+				  map[i] = contents.get(i).toCharArray();
+			  }
+			  this.agents = v;
+			  this.loadMap(map);  //change map here to be the name of your char[][]
+			 
 
-this.loadMap(map);  //change map here to be the name of your char[][]
-this.agent = v;
+		  }
 
-}
+		  catch (FileNotFoundException fnfe)
+		  {
+			  System.out.println("Could not open file: " + fnfe.getMessage());
+		  }
 
-catch (FileNotFoundException fnfe)
-{
-System.out.println("Could not open file: " + fnfe.getMessage());
-}
-
-}
+	  }
 	  
 	  
 	  /**
@@ -145,6 +122,9 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 	  
 	  private void loadMap(char[][] map) throws InvalidMapException {
 		    //get and check room dimensions
+		  
+			agentInfoList = new ArrayList<RoomAgentInfo>();
+
 		    this.roomHeight = map.length;
 		    this.roomWidth = (map.length > 0) ? map[0].length : 0;
 		    if (roomHeight == 0 || roomWidth == 0) {
@@ -157,26 +137,23 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		    this.floorSpaces = 0;
 
 		    //load room, validating as we go
-		    boolean placeAgent = false;
 		    for (int row = 0; row < roomHeight; row++) {  //for each row...
 		      if (map[row].length != roomWidth) {
 		        throw new InvalidMapException("Not all rows of the map " +
 		                                      "are the same length as the first.");
 		      }
-
+		      
 		      for (int col = 0; col < roomWidth; col++) {  //for each col in this row...
 		        //ensure this is a supported character
 		        switch (map[row][col]) {
-		          case STUDENT:
-		            if (placeAgent) {
-		              throw new InvalidMapException("Map contains more than one Vroomba.");
-		            }else {
-		              this.agentCol = col;
-		              this.agentRow = row;
-		              placeAgent = true;
-		            }
+		          case ENTRANCE:	            	           
+		        	  for(int i=0; i< agents.size(); i++){
+		        		  this.agentInfoList.add(new RoomAgentInfo(i, "asdaf", row, col));
+		        	  }
 		            //fall thru (no break)
-		          case FLOOR:
+		          case STUDENT:
+		          case COMPUTER:
+		          case FLOOR:	
 		          case DIRT:
 		            this.floorSpaces++;
 		          case WALL:
@@ -240,15 +217,6 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		          if (room[row][col] == Room.STUDENT) {
 		            //darken the color of this square if necessary
 		            Color color = guiMap[row][col].getBackground();
-		          //  if (color.getRed() > 0) {
-		              //darken, keeping in grey scale
-		              //int darker = color.getRed() - 0x33;
-		             // color = new Color(darker, darker, darker);
-		             // guiMap[row][col].setBackground(color);
-		             // if (darker < 0x66) {
-		               // guiMap[row][col].setForeground(Color.white);
-		             // }
-		          //  }
 		          }
 		        }
 		      }
@@ -322,6 +290,54 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 	      return true; 
 	    
 	}
+	
+	public boolean moveAgents() {
+		 //first, construct a snapshot of the agent's surroundings
+		
+		for(int i =0; i<agents.size(); i++){
+			char[] surround = new char[8];
+			for (Direction d : Direction.values()) {
+				if (d != Direction.HERE) {
+					surround[d.ordinal()] = this.getFeature(d,i);
+				}
+			}
+
+			
+			//now ask agent to move
+			Direction move = agents.get(i).move(surround);
+	
+			//and see where that takes us...
+		
+				
+
+			if(this.getFeature(move, i) == WALL){ //agent crashed into wall, don't do anything
+				System.out.println("I crashed");
+			}
+			else{
+				if(this.room[agentInfoList.get(i).getRow()][agentInfoList.get(i).getCol()] == ENTRANCE){
+					//do nothing
+				}
+				else{ //actually moved successfully!
+					this.room[agentInfoList.get(i).getRow()][agentInfoList.get(i).getCol()] = FLOOR;
+				}
+				//...then moves...
+
+				this.agentInfoList.get(i).setRow(agentInfoList.get(i).getRow() + move.getRowModifier());
+				this.agentInfoList.get(i).setCol(agentInfoList.get(i).getCol() + move.getColModifier());
+
+				//...to new location on map
+
+				this.room[agentInfoList.get(i).getRow()][agentInfoList.get(i).getCol()] = STUDENT;
+
+				//clear the collision streak tracking
+				this.lastMoveIfCollision = null;
+				//valid move, so return below
+			}
+		}
+
+		return true; 
+
+	}
 
 	 public boolean isClean() {
 		//IMPLEMENT THIS
@@ -342,12 +358,20 @@ System.out.println("Could not open file: " + fnfe.getMessage());
 		    }
 		  }
 	 
+
+	 
 	  protected char getFeature(Direction d) {
 		    int row = this.agentRow + d.getRowModifier();
 		    int col = this.agentCol + d.getColModifier();
 		    return this.getFeature(row, col);
 		  }
 	 
+	  
+	  protected char getFeature(Direction d, int i) {	    
+		    int row = this.agentInfoList.get(i).getRow() + d.getRowModifier();
+		    int col = this.agentInfoList.get(i).getCol() + d.getColModifier();
+		    return this.getFeature(row, col);
+		  }
 	  protected int count(char feature) {
 		    int count = 0;
 		    for (int row = 0; row < roomHeight; row++) {

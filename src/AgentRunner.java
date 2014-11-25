@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.KeyStroke;
@@ -20,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * The executable class for the program.
@@ -33,8 +35,10 @@ import java.io.File;
 
 public class AgentRunner implements ActionListener, ChangeListener {
 	
-	  private static Student student = new Student();
-	
+
+	  
+	  private static ArrayList<Student> studentList = new ArrayList<Student>();
+
 	  private Room room;
 	  private Room.GUI roomGUI;
 	  private JFrame window;
@@ -60,8 +64,15 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	 */
 	
 	 public AgentRunner() {
+		 
+		 //Will need to make a more elegant solution later so that we don't need to load agents one by one
+		  studentList.add(new Student(0, "test1"));
+		  studentList.add(new Student(1, "test2"));
+		  studentList.add(new Student(2, "test3"));
+		
+		 
+		 
 		    //create a window
-		    //this.window = new JFrame("GUI Vroomba Runner: " + vroomba.getClass().getName());
 		    this.window = new JFrame("GUI Agent Runner");
 		    window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -86,7 +97,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    //                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 		    //slider
-		    this.speedSlider = new JSlider(0, 1000, 200);  //low, high, initial
+		    this.speedSlider = new JSlider(0, 1000, 400);  //low, high, initial
 		    speedSlider.setBorder(new TitledBorder(speedSlider.getBorder(), "Animation Delay"));
 		    speedSlider.addChangeListener(this);
 		    this.animationDelay = speedSlider.getValue();
@@ -192,8 +203,12 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		      //no room ever loaded, or last room not reset, so no room to clean!
 		    }else {
 		      //clean
-		      this.student.reset();
-		      while (room.moveAgent()) {
+		     // this.student.reset();
+		    	for(Student student : studentList){
+		    		student.reset();
+		    	}
+		    //  while (room.moveAgent()) {
+		     while (room.moveAgents()) {
 		        roomGUI.update();  //update the display after moving
 		        try {
 		          if (this.animationDelay > 0) {
@@ -245,10 +260,13 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	 */
 	
 	protected void refreshRoom() {
-	   // try {
+	    try {
 	      //create/load a new room from file
 	    //  this.room = new Room(this.roomFile.getCanonicalPath(), this.vroomba);
-	      this.room = new Room(this.student);
+	     // this.room = new Room(this.student);
+		this.room = new Room(this.roomFile.getCanonicalPath(), this.studentList);
+		
+		
 	      this.roomGUI = this.room.new GUI();
 
 	      //clear left pane and load with new room
@@ -263,5 +281,16 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	      this.window.validate();
 	      this.goButton.setEnabled(true);
 	  }
+	 catch (java.io.IOException ioe) {
+	      JOptionPane.showMessageDialog(window,
+	          "Could not open file: " + ioe.getMessage(),
+	          "File Error", JOptionPane.ERROR_MESSAGE);
+	    }catch (InvalidMapException ime) {
+	      JOptionPane.showMessageDialog(window,
+	          "File did not contain a valid map: " + ime.getMessage(),
+	          "Map Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	    
 	
+}
 }
