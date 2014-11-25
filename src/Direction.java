@@ -5,10 +5,11 @@
  * 
  * @author Jack Lam
  * @author Branden Ogata
- *
+ * 
  */
 
-public enum Direction {
+public enum Direction
+{
   N, NE, E, SE, S, SW, W, NW, HERE;
 
   /**
@@ -19,10 +20,12 @@ public enum Direction {
    * @return An int equal to the change in X from moving in this Direction.
    * 
    */
-  
-  public int getColModifier() {
+
+  public int getColModifier()
+  {
     int mod;
-    switch (this) {
+    switch (this)
+    {
       case NW:
       case W:
       case SW:
@@ -36,7 +39,7 @@ public enum Direction {
       default:
         mod = 0;
         break;
-      }
+    }
     return mod;
   }
 
@@ -48,10 +51,12 @@ public enum Direction {
    * @return An int equal to the change in Y from moving in this Direction.
    * 
    */
-  
-  public int getRowModifier() {
+
+  public int getRowModifier()
+  {
     int mod;
-    switch (this) {
+    switch (this)
+    {
       case N:
       case NE:
       case NW:
@@ -65,17 +70,19 @@ public enum Direction {
       default:
         mod = 0;
         break;
-      }
+    }
     return mod;
   }
 
   /** As {@link #getColModifier()} */
-  public int getXModifier() {
+  public int getXModifier()
+  {
     return this.getColModifier();
   }
 
   /** As {@link #getRowModifier()} */
-  public int getYModifier() {
+  public int getYModifier()
+  {
     return this.getRowModifier();
   }
 
@@ -85,11 +92,15 @@ public enum Direction {
    * @return A Direction in the opposite Direction of this Direction.
    * 
    */
-  
-  public Direction reverse() {
-    if (this == HERE) {
+
+  public Direction reverse()
+  {
+    if (this == HERE)
+    {
       return this;
-    }else {
+    }
+    else
+    {
       int reversed = (this.ordinal() + 4) % 8;
       Direction[] dirs = Direction.values();
       return dirs[reversed];
