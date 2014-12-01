@@ -3,6 +3,7 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,7 +50,9 @@ public class Room {
 	  
 	  private ArrayList<Student> agents;
 	  private ArrayList<RoomAgentInfo> agentInfoList;
-
+	  
+	  public static MessageQueue currentMessageQueue = new MessageQueue();
+	  public static MessageQueue nextMessageQueue = new MessageQueue();
 
 	  
 	  /**
@@ -124,6 +127,8 @@ public class Room {
 		    //get and check room dimensions
 		  
 			agentInfoList = new ArrayList<RoomAgentInfo>();
+			currentMessageQueue.clearMessageQueue();
+			nextMessageQueue.clearMessageQueue();
 
 		    this.roomHeight = map.length;
 		    this.roomWidth = (map.length > 0) ? map[0].length : 0;
@@ -294,6 +299,8 @@ public class Room {
 	public boolean moveAgents() {
 		 //first, construct a snapshot of the agent's surroundings
 		
+		currentMessageQueue = nextMessageQueue; //getting messages
+		nextMessageQueue.clearMessageQueue();
 		for(int i =0; i<agents.size(); i++){
 			char[] surround = new char[8];
 			for (Direction d : Direction.values()) {
@@ -334,7 +341,8 @@ public class Room {
 				//valid move, so return below
 			}
 		}
-
+		//clear old message queue
+		currentMessageQueue.clearMessageQueue();
 		return true; 
 
 	}

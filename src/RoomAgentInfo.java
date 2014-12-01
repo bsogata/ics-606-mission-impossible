@@ -1,4 +1,11 @@
 
+/**
+ * @author Jack
+ * 
+ * Object to hold agent position information in a room. Room.java uses this class to facilitate
+ * holding multiple agent positions.
+ *
+ */
 public class RoomAgentInfo {
 	
 	int row;

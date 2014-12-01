@@ -15,13 +15,15 @@ public abstract class Agent
    * This developer is not sure how to enforce uniqueness from within an individual agent.
    * 
    */
-  private int id;
+  protected int id;
   
   /**
    * The name of this Agent.
    * 
    */
-  private String name;
+  protected String name;
+  
+  protected int teamid;
   
   /**
    * Creates a new Agent.
@@ -35,6 +37,12 @@ public abstract class Agent
   {
     this.id = id;
     this.name = name;
+  }
+  
+  public Agent(int id, int teamid, String name){
+	  this.id = id;
+	  this.teamid = teamid;
+	  this.name = name;
   }
 
   /**
@@ -92,7 +100,13 @@ public abstract class Agent
    * 
    */
   
+  public int getTeamid(){
+	  return teamid;
+  }
   
+  public void setTeamid(int teamid){
+	  this.teamid = teamid;
+  }
   
   /**
    * Returns the hash code for this Agent.
@@ -138,4 +152,36 @@ public abstract class Agent
     
     return isEqual;
   }
+  
+  
+  /**
+	   * Handy for double-checking that passed surroundings are valid
+	   * (though the only reason they wouldn't be is programmer error somewhere).
+	   * <p>
+	   * Returns if everything's fine, or throws an IllegalArgumentException if not.
+	   *
+	   * @see #move
+	   */
+	  protected void validateSurroundings(char[] surroundings)
+	                                     throws IllegalArgumentException {
+	    if (surroundings.length != 8) {
+	      throw new IllegalArgumentException("Surroundings array the wrong length (" +
+	                                         surroundings.length + " instead of 8)");
+	    }
+	    for (int i = 0; i < surroundings.length; i++) {
+	      switch (surroundings[i]) {
+	        //XXX: A Vroomba currently can't handle seeing another version of itself
+	        case Room.FLOOR:
+	        case Room.DIRT:
+	        case Room.WALL:
+	        case Room.DROP:
+	          break;  //good
+	        default:
+	          throw new IllegalArgumentException("Invalid character in surroundings (" +
+	                                            surroundings[i] + ")");
+	      }
+	    }
+	    return; //array was fine
+	  }
+
 }

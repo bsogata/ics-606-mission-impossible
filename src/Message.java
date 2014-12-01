@@ -1,4 +1,4 @@
-package message;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,10 @@ public class Message
    * 
    */
   private List<Integer> recipients;
+  
+  private ArrayList<Square> map;
+
+  private boolean returnHome;
   
   /**
    * Creates a new Message.
@@ -115,5 +119,26 @@ public class Message
     return recipients;
   }
   
+  public Message(ArrayList<Square> map, int teamId, int senderId)
+  {
+    this.map = map;
+    this.teamId = teamId;
+    this.senderId = senderId;
+
+  }
+  
+  public Message(boolean returnHome, int teamId, int senderId){
+	  this.returnHome = returnHome;
+	  this.teamId = teamId;
+	  this.senderId = senderId;
+  }
+  
+  public boolean getReturnHome(){
+	  return returnHome;
+  }
+
+  public ArrayList<Square> getMap(){
+	  return map;
+  }
   
 }
