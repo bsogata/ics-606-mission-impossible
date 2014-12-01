@@ -1,3 +1,4 @@
+package navigation;
 /**
  * The various directions to travel in this simulation.
  * 

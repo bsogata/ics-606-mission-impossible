@@ -1,3 +1,4 @@
+import agent.Student;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -15,6 +16,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import room.InvalidMapException;
+import room.Room;
 import message.Message;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -237,10 +240,13 @@ public class AgentRunner implements ActionListener, ChangeListener
       for (Student student : studentList)
       {
         student.reset();
+        student.setMap(room.getMap());
       }
       // while (room.moveAgent()) {
       while (room.moveAgents())
       {
+        // Send message (if necessary)
+        // Receive messages (if necesary)
         roomGUI.update(); // update the display after moving
         try
         {

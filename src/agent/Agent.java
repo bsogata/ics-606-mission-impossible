@@ -1,5 +1,7 @@
 package agent;
 
+import navigation.Direction;
+
 /**
  * The template for non-JADE agents.
  * 
@@ -91,6 +93,8 @@ public abstract class Agent
    * This is left for subclasses to implement.
    * 
    */
+  
+  public abstract Direction moveAgent(int row, int col);
 
   /**
    * Returns the hash code for this Agent.
