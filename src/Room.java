@@ -299,7 +299,7 @@ public class Room {
 	public boolean moveAgents() {
 		 //first, construct a snapshot of the agent's surroundings
 		
-		currentMessageQueue = nextMessageQueue; //getting messages
+		currentMessageQueue = new MessageQueue(nextMessageQueue); //getting messages
 		nextMessageQueue.clearMessageQueue();
 		for(int i =0; i<agents.size(); i++){
 			char[] surround = new char[8];
@@ -342,7 +342,7 @@ public class Room {
 			}
 		}
 		//clear old message queue
-		currentMessageQueue.clearMessageQueue();
+		//currentMessageQueue.clearMessageQueue();
 		return true; 
 
 	}

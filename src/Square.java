@@ -10,7 +10,7 @@ class Square
 	private int x = 0;
 	private int y = 0;
 	private boolean isVisited = false;
-	private boolean isObsticle = false;
+	private boolean isObstacle = false;
 	private boolean isHere = false;
 	
 	//values used for A* search. disregard if not needed;
@@ -23,6 +23,18 @@ class Square
 		y = s;
 		isVisited = isVisited;
 		isObsticle = isObsticle;		
+	}
+	
+	public Square(Square another){
+		this.x = another.x;
+		this.y = another.y;
+		this.isVisited = another.isVisited;
+		this.isObstacle = another.isObstacle();
+		this.isHere = another.getIsHere();
+		this.f = another.getF();
+		this.g = another.getG();
+		this.h = another.getH();
+		this.parent = another.getParent();
 	}
 	
 	//Returns x value of square.
@@ -45,9 +57,9 @@ class Square
 	}
 	
 	//Returns the truth value if the square is an obsticle or not.
-	public boolean isObsticle()
+	public boolean isObstacle()
 	{
-		return isObsticle;
+		return isObstacle;
 	}
 	
 	//Sets isVisit value to true.
@@ -59,7 +71,7 @@ class Square
 	//Sets isObsticle value to true.
 	public void setToObsticle()
 	{
-		isObsticle = true;
+		isObstacle = true;
 	}  
 	
 	public void setIsHereTrue(){
@@ -106,6 +118,14 @@ class Square
 		this.parent = parent;
 	}
 	
-	
+	public boolean equals(Square another){
+		if(this.x == another.x && this.y == another.y){
+			return true;
+		}
+		else{
+			return false;
+		}
+		
+	}
 	
 }

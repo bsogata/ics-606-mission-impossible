@@ -33,7 +33,7 @@ public class Student extends Agent {
 
 		
 		private Message sendMessage;
-		private LinkedList<Message> receiveMessages;
+		private MessageQueue receiveMessages;
 		
 		private ArrayList<Square> pathToHome = null;
 		private boolean returnHome = false;
@@ -63,11 +63,11 @@ public class Student extends Agent {
 		
 		
 		//check messages
-		receiveMessages = Room.currentMessageQueue.getMessages();
+		receiveMessages = new MessageQueue(Room.currentMessageQueue);
 		
 		//Check if we can go home
-		for(int i=0; i<receiveMessages.size(); i++){
-			if(receiveMessages.get(i).getReturnHome() == true){
+		for(int i=0; i<receiveMessages.getMessages().size(); i++){
+			if(receiveMessages.getMessages().get(i).getReturnHome() == true){
 				returnHome = true;
 				break;
 			}
@@ -77,17 +77,18 @@ public class Student extends Agent {
 		if(returnHome == false){
 			
 			//Synchronize map with new information from agents
-			for(int i=0;i<receiveMessages.size(); i++){
-				if(receiveMessages.get(i).getSenderId() == id){
+			for(int i=0;i<receiveMessages.getMessages().size(); i++){
+				if(receiveMessages.getMessages().get(i).getSenderId() == id){
 					continue; //I sent this message, don't need to read myself
 				}
-				 ArrayList<Square> temp = receiveMessages.get(i).getMap();
+				 ArrayList<Square> temp = receiveMessages.getMessages().get(i).getMap();
 				 boolean addToMap = true;
 				 for(int j=0;j<temp.size(); j++){
 					 for(int k=0; k<map.size(); k++){
 						 //check if I already have this in my map
-						 if((map.get(k).getX() == temp.get(j).getX()) && map.get(k).getY() == temp.get(j).getY()){
-							 addToMap = false;
+						 //if((map.get(k).getX() == temp.get(j).getX()) && map.get(k).getY() == temp.get(j).getY()){
+						 if(map.get(k).equals(temp.get(j))){
+						 	addToMap = false;
 							 break;
 						 }
 					 }
@@ -150,14 +151,14 @@ public class Student extends Agent {
 			
 			//Checks to see if the Roomba is surrounded by visited squares and
 			//obsticles.  If it is, it will backtrack its last square.	
-			if((getSquare(x,c).wasVisited() || getSquare(x,c).isObsticle()) && 
-			(getSquare(x,d).wasVisited()|| getSquare(x,d).isObsticle()) && 
-			(getSquare(a,y).wasVisited()|| getSquare(a,y).isObsticle()) && 
-			(getSquare(b,y).wasVisited()|| getSquare(b,y).isObsticle()) && 
-			(getSquare(a,c).wasVisited()|| getSquare(a,c).isObsticle()) && 
-			(getSquare(a,d).wasVisited()|| getSquare(a,d).isObsticle()) && 
-			(getSquare(b,c).wasVisited()|| getSquare(b,c).isObsticle()) && 
-			(getSquare(b,d).wasVisited()|| getSquare(b,d).isObsticle())) {			
+			if((getSquare(x,c).wasVisited() || getSquare(x,c).isObstacle()) && 
+			(getSquare(x,d).wasVisited()|| getSquare(x,d).isObstacle()) && 
+			(getSquare(a,y).wasVisited()|| getSquare(a,y).isObstacle()) && 
+			(getSquare(b,y).wasVisited()|| getSquare(b,y).isObstacle()) && 
+			(getSquare(a,c).wasVisited()|| getSquare(a,c).isObstacle()) && 
+			(getSquare(a,d).wasVisited()|| getSquare(a,d).isObstacle()) && 
+			(getSquare(b,c).wasVisited()|| getSquare(b,c).isObstacle()) && 
+			(getSquare(b,d).wasVisited()|| getSquare(b,d).isObstacle())) {			
 			
 
 				if(history.size() == 0){
@@ -209,19 +210,37 @@ public class Student extends Agent {
 			}
 		}
 		else{ //Perform A* search to return home
-			Square currentLocation = getCurrentSquare();
-			int col = currentLocation.getX();
-			int row = currentLocation.getY();
+			//Square currentLocation = getCurrentSquare();
+			
+			Square currentLocation = new Square(x,y, false, false);
+			//int col = currentLocation.getX();
+			//int row = currentLocation.getY();
+			
+			int col = x;
+			int row = y;
 
 			if(pathToHome == null){
 				pathToHome = aStarSearch(currentLocation, map.get(0));
 				return Direction.HERE;
 			}
 			else{
-				if(counterForHome >= pathToHome.size()){
+//				if(counterForHome >= pathToHome.size()){
+//					System.out.println("I am done " + id);
+//					return Direction.HERE;
+//				}
+				
+				if(x == 0 && y == 0){
+					System.out.println("I am done " + id);
 					return Direction.HERE;
 				}
+				
 				Direction nextMove;
+				
+				if(counterForHome >=pathToHome.size()){
+					pathToHome = aStarSearch(currentLocation, map.get(0));
+					counterForHome = 0;
+				}
+				
 				int nextCol = pathToHome.get(counterForHome).getX();
 				int nextRow = pathToHome.get(counterForHome).getY();
 				
@@ -346,30 +365,31 @@ public class Student extends Agent {
 		return null;
 	}
     
-
-
- 	public ArrayList<Square> aStarSearch(Square start, Square goal){
+ 	private ArrayList<Square> aStarSearch(Square start, Square goal){
  		int currentRow, currentCol;
  		ArrayList<Square> closedSet = new ArrayList<Square>(); 	
  		ArrayList<Square> openSet = new ArrayList<Square>();
  		ArrayList<Square> pathToGoal = new ArrayList<Square>();
  		boolean foundGoal = false;
  		start.setF(0);
+
  		openSet.add(start);
  		
 		while (!openSet.isEmpty() && foundGoal == false) {
 			Square q;
 		
 			// find smallest f in openset
+			int tempi = 0;
 			q = openSet.get(0);
 			for (int i = 1; i < openSet.size(); i++) {
 				if (openSet.get(i).getF() < q.getF()) {
 					q = openSet.get(i);
+					tempi = i;
 				}
 			}
 			
 			//pop q off the openset
-			openSet.remove(q);
+			openSet.remove(tempi);
 			
 			//Generate successors to q
 			ArrayList<Square> successors = new ArrayList<Square>();
@@ -379,66 +399,44 @@ public class Student extends Agent {
 			Square temp;
 			//North
 			temp = getSquare(currentRow-1, currentCol);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle() ){
 				successors.add(temp);
 			}
 			//NorthEast
 			temp = getSquare(currentRow-1, currentCol+1);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle() ){
 				successors.add(temp);
 			}
 			//East
 			temp = getSquare(currentRow, currentCol+1);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle() ){				
 				successors.add(temp);
 			}
 			//SouthEast
 			temp = getSquare(currentRow+1, currentCol+1);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle() ){
 				successors.add(temp);
 			}
 			//South
 			temp = getSquare(currentRow+1, currentCol);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle()){
 				successors.add(temp);
 			}
 			//SouthWest
 			temp = getSquare(currentRow+1, currentCol-1);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle( )){
 				successors.add(temp);
 			}
 			//West
 			temp = getSquare(currentRow, currentCol-1);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle()){
+				
 				successors.add(temp);
 			}
 			//NorthWest
 			temp = getSquare(currentRow-1, currentCol-1);
-			if(temp != null && !temp.isObsticle()){
-				if(temp.getParent() == null){
-					temp.setParent(q);
-				}
+			if(temp != null && !temp.isObstacle()){
+				
 				successors.add(temp);
 			}
 			
@@ -446,45 +444,53 @@ public class Student extends Agent {
 			for(int i =0; i< successors.size(); i++){
 				if((successors.get(i).getY() == goal.getY()) && (successors.get(i).getX() == goal.getX())){
 					//Found my goal.
+					successors.get(i).setParent(q);
 					closedSet.add(successors.get(i));
 					foundGoal = true;
 					break;
 				}
 				successors.get(i).setG(q.getG() + 1);
-				int temph = (int) Math.sqrt(Math.pow(successors.get(i).getY() - goal.getY(), 2) + 
-						Math.pow(successors.get(i).getX() - goal.getX(), 2));
+				//Chbyshev distance
+				int temph = Math.max(Math.abs(successors.get(i).getY() - goal.getY()), Math.abs(successors.get(i).getX()- goal.getX()));
 				successors.get(i).setH(temph);
 				successors.get(i).setF(successors.get(i).getH() + successors.get(i).getG());
 				
-			//Decide if I should add this to the openset
+
+				
 				boolean doNothing = false;
-				for(int j=0;j<openSet.size(); j++){
-					if((openSet.get(j).getY() == successors.get(i).getY()) && 
-							(openSet.get(j).getX() == successors.get(i).getX()) &&
-							(openSet.get(j).getF() < successors.get(i).getF())){
-							doNothing = true;
-					}
-				}
+
+				
+				//is this in my closedset? if it is, do not add to openset.
 				for(int j=0;j<closedSet.size(); j++){
-					if((closedSet.get(j).getY() == successors.get(i).getY()) && 
-							(closedSet.get(j).getX() == successors.get(i).getX()) &&
-							(closedSet.get(j).getF() < successors.get(i).getF())){
+					if((closedSet.get(j).equals(successors.get(i)))  ){
 							doNothing = true;
 					}
 				}
+				
+				//is this in my openset? if I am, check to see if F is better. update with new values
+				for(int j=0;j<openSet.size(); j++){
+					if(openSet.get(j).equals(successors.get(i)) &&
+							( successors.get(i).getF() <= openSet.get(j).getF())){
+							doNothing = true;
+							openSet.get(j).setF(successors.get(i).getF());
+							openSet.get(j).setParent(q);
+					}
+				}
+				
 				if(doNothing == false){
+					successors.get(i).setParent(q);
 					openSet.add(successors.get(i));
 				}
 				
+				
+		
 				
 			//done. Push q to closed list
 				closedSet.add(q);
 			}
 			
 		}
-		
-
-		
+	
 		Square qq = closedSet.get(closedSet.size() -1);
 	
 		while(true){
@@ -509,5 +515,6 @@ public class Student extends Agent {
  	}
  	  
 
+ 
   }
 
