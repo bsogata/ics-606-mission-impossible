@@ -255,8 +255,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	protected void refreshRoom() {
 	    try {
 	      //create/load a new room from file
-	    //  this.room = new Room(this.roomFile.getCanonicalPath(), this.vroomba);
-	     // this.room = new Room(this.student);
+
 		this.room = new Room(this.roomFile.getCanonicalPath(), this.studentList);
 		
 		
@@ -269,7 +268,8 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	       * FIX: setting the roomGUI's preferredSize to that of its parent pane
 	       * works well on initial load, but still doesn't handle window resizes.
 	       */
-	      roomGUI.setPreferredSize(leftPane.getSize());
+	     // roomGUI.setPreferredSize(leftPane.getSize());
+	      roomGUI.setSize(100, 100);
 	      leftPane.add(roomGUI);
 	      this.window.validate();
 	      this.goButton.setEnabled(true);
