@@ -74,7 +74,7 @@ public class Student extends Agent {
 		}
 		
 		
-		if(returnHome == false){
+	
 			
 			//Synchronize map with new information from agents
 			for(int i=0;i<receiveMessages.getMessages().size(); i++){
@@ -82,18 +82,20 @@ public class Student extends Agent {
 					continue; //I sent this message, don't need to read myself
 				}
 				 ArrayList<Square> temp = receiveMessages.getMessages().get(i).getMap();
-				 boolean addToMap = true;
-				 for(int j=0;j<temp.size(); j++){
-					 for(int k=0; k<map.size(); k++){
-						 //check if I already have this in my map
-						 //if((map.get(k).getX() == temp.get(j).getX()) && map.get(k).getY() == temp.get(j).getY()){
-						 if(map.get(k).equals(temp.get(j))){
-						 	addToMap = false;
-							 break;
+				 if(temp != null){
+					 boolean addToMap = true;
+					 for(int j=0;j<temp.size(); j++){
+						 for(int k=0; k<map.size(); k++){
+							 //check if I already have this in my map
+							 //if((map.get(k).getX() == temp.get(j).getX()) && map.get(k).getY() == temp.get(j).getY()){
+							 if(map.get(k).equals(temp.get(j))){
+							 	addToMap = false;
+								 break;
+							 }
 						 }
-					 }
-					 if(addToMap == true){
-						 map.add(temp.get(j));
+						 if(addToMap == true){
+							 map.add(temp.get(j));
+						 }
 					 }
 				 }
 			}
@@ -149,30 +151,31 @@ public class Student extends Agent {
 					getSquare(b,d).setToObsticle();
 				}
 			
-			//Checks to see if the Roomba is surrounded by visited squares and
-			//obsticles.  If it is, it will backtrack its last square.	
-			if((getSquare(x,c).wasVisited() || getSquare(x,c).isObstacle()) && 
-			(getSquare(x,d).wasVisited()|| getSquare(x,d).isObstacle()) && 
-			(getSquare(a,y).wasVisited()|| getSquare(a,y).isObstacle()) && 
-			(getSquare(b,y).wasVisited()|| getSquare(b,y).isObstacle()) && 
-			(getSquare(a,c).wasVisited()|| getSquare(a,c).isObstacle()) && 
-			(getSquare(a,d).wasVisited()|| getSquare(a,d).isObstacle()) && 
-			(getSquare(b,c).wasVisited()|| getSquare(b,c).isObstacle()) && 
-			(getSquare(b,d).wasVisited()|| getSquare(b,d).isObstacle())) {			
-			
+			if(returnHome == false){
+				//Checks to see if the Roomba is surrounded by visited squares and
+				//obsticles.  If it is, it will backtrack its last square.	
+				if((getSquare(x,c).wasVisited() || getSquare(x,c).isObstacle()) && 
+						(getSquare(x,d).wasVisited()|| getSquare(x,d).isObstacle()) && 
+						(getSquare(a,y).wasVisited()|| getSquare(a,y).isObstacle()) && 
+						(getSquare(b,y).wasVisited()|| getSquare(b,y).isObstacle()) && 
+						(getSquare(a,c).wasVisited()|| getSquare(a,c).isObstacle()) && 
+						(getSquare(a,d).wasVisited()|| getSquare(a,d).isObstacle()) && 
+						(getSquare(b,c).wasVisited()|| getSquare(b,c).isObstacle()) && 
+						(getSquare(b,d).wasVisited()|| getSquare(b,d).isObstacle())) {			
 
-				if(history.size() == 0){
-					return Direction.HERE;
+
+					if(history.size() == 0){
+						return Direction.HERE;
+					}
+					lastMove = history.get(history.size()-1).reverse();
+					history.remove(history.size()-1);
+					x = x+lastMove.getXModifier();
+					y = y+lastMove.getYModifier();
+					getSquare(x,y).setToVisit();
+					return lastMove;
+
 				}
-				lastMove = history.get(history.size()-1).reverse();
-				history.remove(history.size()-1);
-				x = x+lastMove.getXModifier();
-				y = y+lastMove.getYModifier();
-				getSquare(x,y).setToVisit();
-				return lastMove;
-					
-			}
-			
+
 			else {	
 				//Randomly picks a square that the Roomba has not visited yet and goes there.
 				//Also changes the square to Visited.
@@ -237,9 +240,16 @@ public class Student extends Agent {
 				Direction nextMove;
 				
 				if(counterForHome >=pathToHome.size()){
-					pathToHome = aStarSearch(currentLocation, map.get(0));
-					counterForHome = 0;
+					while(true){
+					
+						pathToHome = aStarSearch(currentLocation, map.get(0));
+						counterForHome = 0;
+						if(pathToHome.size() > 0){
+							break;
+						}
+					}
 				}
+				
 				
 				int nextCol = pathToHome.get(counterForHome).getX();
 				int nextRow = pathToHome.get(counterForHome).getY();
@@ -349,6 +359,7 @@ public class Student extends Agent {
 		return null;
 	}		
 
+	//Get square for my current position at x,y
 	public Square getCurrentSquare(){
 		for( int j= 0; j < map.size(); j++)
 		{
@@ -372,11 +383,15 @@ public class Student extends Agent {
  		ArrayList<Square> pathToGoal = new ArrayList<Square>();
  		boolean foundGoal = false;
  		start.setF(0);
-
+ 		Square q;
  		openSet.add(start);
  		
+ 		if(openSet.isEmpty()){
+ 			System.out.println("openset is eempty!!!");
+ 		}
+ 		
 		while (!openSet.isEmpty() && foundGoal == false) {
-			Square q;
+			
 		
 			// find smallest f in openset
 			int tempi = 0;
@@ -390,6 +405,7 @@ public class Student extends Agent {
 			
 			//pop q off the openset
 			openSet.remove(tempi);
+			closedSet.add(q);
 			
 			//Generate successors to q
 			ArrayList<Square> successors = new ArrayList<Square>();
@@ -398,43 +414,43 @@ public class Student extends Agent {
 			
 			Square temp;
 			//North
-			temp = getSquare(currentRow-1, currentCol);
+			temp = getSquare(currentCol, currentRow-1);
 			if(temp != null && !temp.isObstacle() ){
 				successors.add(temp);
 			}
 			//NorthEast
-			temp = getSquare(currentRow-1, currentCol+1);
+			temp = getSquare(currentCol+1, currentRow-1);
 			if(temp != null && !temp.isObstacle() ){
 				successors.add(temp);
 			}
 			//East
-			temp = getSquare(currentRow, currentCol+1);
+			temp = getSquare(currentCol+1, currentRow);
 			if(temp != null && !temp.isObstacle() ){				
 				successors.add(temp);
 			}
 			//SouthEast
-			temp = getSquare(currentRow+1, currentCol+1);
+			temp = getSquare(currentCol+1, currentRow+1);
 			if(temp != null && !temp.isObstacle() ){
 				successors.add(temp);
 			}
 			//South
-			temp = getSquare(currentRow+1, currentCol);
+			temp = getSquare(currentCol, currentRow+1);
 			if(temp != null && !temp.isObstacle()){
 				successors.add(temp);
 			}
 			//SouthWest
-			temp = getSquare(currentRow+1, currentCol-1);
+			temp = getSquare(currentCol-1, currentRow+1);
 			if(temp != null && !temp.isObstacle( )){
 				successors.add(temp);
 			}
 			//West
-			temp = getSquare(currentRow, currentCol-1);
+			temp = getSquare(currentCol-1, currentRow);
 			if(temp != null && !temp.isObstacle()){
 				
 				successors.add(temp);
 			}
 			//NorthWest
-			temp = getSquare(currentRow-1, currentCol-1);
+			temp = getSquare(currentCol-1, currentRow-1);
 			if(temp != null && !temp.isObstacle()){
 				
 				successors.add(temp);
@@ -450,8 +466,11 @@ public class Student extends Agent {
 					break;
 				}
 				successors.get(i).setG(q.getG() + 1);
-				//Chbyshev distance
+				//Chebyshev distance
 				int temph = Math.max(Math.abs(successors.get(i).getY() - goal.getY()), Math.abs(successors.get(i).getX()- goal.getX()));
+				
+				//Try manhatten distance
+				//int temph = Math.abs(successors.get(i).getY() - goal.getY()) + Math.abs(successors.get(i).getX()- goal.getX());
 				successors.get(i).setH(temph);
 				successors.get(i).setF(successors.get(i).getH() + successors.get(i).getG());
 				
@@ -485,12 +504,25 @@ public class Student extends Agent {
 				
 		
 				
-			//done. Push q to closed list
-				closedSet.add(q);
-			}
+		
 			
+				
+				
+			}
+			//closedSet.add(q);
+			//closedSet.add(new Square(q));
+			//done. Push q to closed list
+			if(closedSet.size() == 0){
+				System.out.println("q is null!!!!");
+			}
+			//openSet.remove(tempi);
 		}
-	
+//END OF WHILE LOOP ENTER PHASE 2	
+		
+		if(closedSet.size() == 0){
+			System.out.println("q is null!!!!");
+		}
+		
 		Square qq = closedSet.get(closedSet.size() -1);
 	
 		while(true){

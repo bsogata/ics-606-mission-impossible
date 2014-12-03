@@ -68,7 +68,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		 //Will need to make a more elegant solution later so that we don't need to load agents one by one
 		  studentList.add(new Student(0,1, "test1"));
 		  studentList.add(new Student(1,1, "test2"));
-		 // studentList.add(new Student(2,1, "test3"));
+		  studentList.add(new Student(2,1, "test3"));
 		
 		 
 		 
