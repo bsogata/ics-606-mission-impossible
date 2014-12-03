@@ -263,7 +263,7 @@ public class Student3 extends Agent {
 			else{
 				
 				if(x == 0 && y == 0){
-					System.out.println("I am done " + id);
+					//System.out.println("I am done " + id);
 					iAmDone = true;
 					return Direction.HERE;
 				}
