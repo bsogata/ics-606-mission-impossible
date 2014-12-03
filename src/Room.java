@@ -44,11 +44,11 @@ public class Room {
 	  
 	  private Result done = null;  //will be null until cleaning is done
 
-	  private Student agent; //agent stuff
+	  private Agent agent; //agent stuff
 	  private int agentRow;  //current agent location on room map,
 	  private int agentCol;  // where top-left square of Room is (0,0)
 	  
-	  private ArrayList<Student> agents;
+	  private ArrayList<Agent> agents;
 	  private ArrayList<RoomAgentInfo> agentInfoList;
 	  
 	  public static MessageQueue currentMessageQueue = new MessageQueue();
@@ -65,7 +65,7 @@ public class Room {
 	   * 
 	   */
 	  
-	  public Room(char[][] map, Student v) throws InvalidMapException {
+	  public Room(char[][] map, Agent v) throws InvalidMapException {
 		    this.loadMap(map);
 		    this.agent = v;
 		  }
@@ -81,7 +81,7 @@ public class Room {
 	   * 
 	   */
 	  
-	  public Room(String mapFilename, ArrayList<Student> v) throws FileNotFoundException,
+	  public Room(String mapFilename, ArrayList<Agent> v) throws FileNotFoundException,
 	  InvalidMapException {
 
 		  try
@@ -114,7 +114,10 @@ public class Room {
 	  }
 	  
 	  
-	  /**
+
+
+
+	/**
 	   * Loads a map into this Room.
 	   * 
 	   * @param map    The char[][] containing the map to load.
@@ -341,10 +344,13 @@ public class Room {
 				//valid move, so return below
 			}
 		}
-		//clear old message queue
-		//currentMessageQueue.clearMessageQueue();
-		return true; 
 
+		for(int j =0; j<agents.size(); j++){
+			if(!agents.get(j).getiAmDone()){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	 public boolean isClean() {
@@ -353,6 +359,7 @@ public class Room {
 
 				if (count('.') == 0) return true;
 				else return false;
+				
 				
 		   
 		  }

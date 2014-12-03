@@ -16,6 +16,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,10 +36,7 @@ import java.util.ArrayList;
 
 public class AgentRunner implements ActionListener, ChangeListener {
 	
-
-	  
-	  private static ArrayList<Student> studentList = new ArrayList<Student>();
-
+	  private static ArrayList<Agent> studentList = new ArrayList<Agent>();  
 	  private Room room;
 	  private Room.GUI roomGUI;
 	  private JFrame window;
@@ -65,12 +63,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	
 	 public AgentRunner() {
 		 
-		 //Will need to make a more elegant solution later so that we don't need to load agents one by one
-		  studentList.add(new Student(0,1, "test1"));
-		  studentList.add(new Student(1,1, "test2"));
-		  studentList.add(new Student(2,1, "test3"));
-		
-		 
+		 studentList = AgentRunnerHelper.makeAgents();
 		 
 		    //create a window
 		    this.window = new JFrame("GUI Agent Runner");
@@ -204,7 +197,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    }else {
 		      //clean
 		     // this.student.reset();
-		    	for(Student student : studentList){
+		    	for(Agent student : studentList){
 		    		student.reset();
 		    	}
 		    //  while (room.moveAgent()) {

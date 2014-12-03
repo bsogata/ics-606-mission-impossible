@@ -7,14 +7,16 @@ import java.util.Random;
 
 
 /**
- * A Student agent that will only visit non-visited cells. Backtrack if there are cells that are
- * visited.
+ * A Student agent that will only visit non-visited cells. If all surrounded cells are visited,
+ * use A* search to find the first non-visited cell.
+ * 
+ * BUG: will infinite loop the agent at times and not do anything useful.
  * 
  * @author Jack
  *
  */
 
-public class Student extends Agent {
+public class Student2 extends Agent {
 	private boolean hasComputer;
 	 private ArrayList<Square> map = new ArrayList<Square>();
 		private int x=0;
@@ -40,8 +42,6 @@ public class Student extends Agent {
 		private int counterForHome = 0;
 		
 		private boolean iAmDone;
-		
-
 	
   /**
    * Creates a Student agent.
@@ -51,7 +51,7 @@ public class Student extends Agent {
    * 
    */
   
-  public Student(int id,int teamid, String name) {
+  public Student2(int id,int teamid, String name) {
     super(id,teamid, name);
   }
    
@@ -110,7 +110,7 @@ public class Student extends Agent {
 			c = y+1;
 			d = y-1;
 			
-			//Checks to see if the squares around Agent are in the map
+			//Checks to see if the squares around Roomba are in the map
 			if (!map.contains(getSquare(x,c))) map.add(new Square(x,c,false, false));
 			if (!map.contains(getSquare(x,d))) map.add(new Square(x,d,false, false));
 			if (!map.contains(getSquare(a,y))) map.add(new Square(a,y,false, false));
@@ -120,7 +120,7 @@ public class Student extends Agent {
 			if (!map.contains(getSquare(b,c))) map.add(new Square(b,c,false, false));
 			if (!map.contains(getSquare(b,d))) map.add(new Square(b,d,false, false));
 			
-			//Checks to see if the squares around Agent are obstacles.  If they are,
+			//Checks to see if the squares around Roomba are obstacles.  If they are,
 			//sets those squares to be obstacles.
 			if ((s[dirs[0].ordinal()] == Room.WALL))
 				{
@@ -156,7 +156,7 @@ public class Student extends Agent {
 				}
 			
 			if(returnHome == false){
-				//Checks to see if the Agent is surrounded by visited squares and
+				//Checks to see if the Roomba is surrounded by visited squares and
 				//obsticles.  If it is, it will backtrack its last square.	
 				if((getSquare(x,c).wasVisited() || getSquare(x,c).isObstacle()) && 
 						(getSquare(x,d).wasVisited()|| getSquare(x,d).isObstacle()) && 
@@ -168,20 +168,28 @@ public class Student extends Agent {
 						(getSquare(b,d).wasVisited()|| getSquare(b,d).isObstacle())) {			
 
 
-					if(history.size() == 0){
-						return Direction.HERE;
+					Square notVisitedSquare = null;
+					for(int i=0; i< map.size();i++){
+						if(!map.get(i).wasVisited()){
+							notVisitedSquare = map.get(i);
+						}
 					}
-					lastMove = history.get(history.size()-1).reverse();
-					history.remove(history.size()-1);
-					x = x+lastMove.getXModifier();
-					y = y+lastMove.getYModifier();
-					getSquare(x,y).setToVisit();
-					return lastMove;
+					
+					ArrayList<Square> closestNonVisited = aStarSearch(getCurrentSquare(), notVisitedSquare);
+					
+					Square goToSquare = closestNonVisited.get(0);
+					
+					Direction goDirection = directionGivenSquare(x, y, goToSquare);
+					
+					x = x+goDirection.getXModifier();
+					y = y+goDirection.getYModifier();
+					
+					return goDirection;
 
 				}
 
 			else {	
-				//Randomly picks a square that the Agent has not visited yet and goes there.
+				//Randomly picks a square that the Roomba has not visited yet and goes there.
 				//Also changes the square to Visited.
 				while(true){
 					for(int i=0; i<dirs.length -1; i++){
@@ -217,12 +225,9 @@ public class Student extends Agent {
 			}
 		}
 		else{ //Perform A* search to return home
-			//Square currentLocation = getCurrentSquare();
 			
 			Square currentLocation = new Square(x,y, false, false);
-			//int col = currentLocation.getX();
-			//int row = currentLocation.getY();
-			
+	
 			int col = x;
 			int row = y;
 
@@ -304,7 +309,7 @@ public class Student extends Agent {
 		}
 	}		
 
-	//Resets the Agent's values.
+	//Resets the Roomba's values.
 	public void reset()
 	{
 		x = 0;
@@ -324,10 +329,7 @@ public class Student extends Agent {
 		counterForHome =0;
 		returnHome = false;
 		hasComputer = false;
-		pathToHome = null;
-		
-		 sendMessage = null;
-		 receiveMessages = null;
+		ArrayList<Square> pathToHome = null;
 		
 		iAmDone = false;
 	}
@@ -379,13 +381,9 @@ public class Student extends Agent {
  		Square q;
  		openSet.add(start);
  		
- 		if(openSet.isEmpty()){
- 			System.out.println("openset is eempty!!!");
- 		}
  		
 		while (!openSet.isEmpty() && foundGoal == false) {
-			
-		
+				
 			// find smallest f in openset
 			int tempi = 0;
 			q = openSet.get(0);
@@ -489,14 +487,7 @@ public class Student extends Agent {
 				if(doNothing == false){
 					successors.get(i).setParent(q);
 					openSet.add(successors.get(i));
-				}
-				
-				
-		
-				
-		
-			
-				
+				}		
 				
 			}
 			//done. Push q to closed list
@@ -531,10 +522,57 @@ public class Student extends Agent {
 		return pathToGoal;
  	}
  	  
+
+ 	private Direction directionGivenSquare(int x, int y, Square goal){
+ 		Direction nextMove;
+ 		int nextCol = goal.getX();
+		int nextRow = goal.getY();
+ 		int northOrSouth = y - nextRow;
+		int westOrEast = x - nextCol;
+
+		
+		if(northOrSouth > 0){ //Go North
+			if(westOrEast < 0){ //Go East
+				nextMove = Direction.NE; 
+			}
+			else if(westOrEast > 0){//Go west
+				nextMove = Direction.NW;
+			}
+			else{ //just go north
+				nextMove = Direction.N;
+			}
+		}
+		else if (northOrSouth < 0){ //South
+			if(westOrEast < 0){ //Go East
+				nextMove = Direction.SE; 
+			}
+			else if(westOrEast > 0){//Go west
+				nextMove = Direction.SW;
+			}
+			else{ //just go south
+				nextMove = Direction.S;
+			}
+		}
+		else{ //Don't go north or south
+			if(westOrEast < 0){ //Go East
+				nextMove = Direction.E; 
+			}
+			else if(westOrEast > 0){//Go west
+				nextMove = Direction.W;
+			}
+			else{
+				nextMove = Direction.HERE;
+			}
+		}
+		
+		return nextMove;
+ 	}
+
+
 	public boolean getiAmDone() {
 		return iAmDone;
 	}
  
- 
+ 	
   }
 

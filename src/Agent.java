@@ -134,6 +134,10 @@ public abstract class Agent
    * 
    */
   
+  
+
+  
+  
   @Override
   public boolean equals(Object obj)
   {
@@ -184,4 +188,22 @@ public abstract class Agent
 	    return; //array was fine
 	  }
 
+
+
+public Direction move(char[] surround) {
+	// TODO Auto-generated method stub
+	return Direction.HERE;
+}
+
+public void reset() {
+	// TODO Auto-generated method stub
+	
+}
+
+
+
+public boolean getiAmDone() {
+	// TODO Auto-generated method stub
+	return false;
+}
 }
