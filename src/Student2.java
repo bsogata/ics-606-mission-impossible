@@ -8,7 +8,7 @@ import java.util.Random;
 
 /**
  * A Student agent that will only visit non-visited cells. If all surrounded cells are visited,
- * use A* search to find the first non-visited cell.
+ * use A* search to find the first non-visited cell. (Stack-like fashion)
  * 
  * BUG: will infinite loop the agent at times and not do anything useful.
  * 
@@ -110,7 +110,7 @@ public class Student2 extends Agent {
 			c = y+1;
 			d = y-1;
 			
-			//Checks to see if the squares around Roomba are in the map
+			//Checks to see if the squares around Agent are in the map
 			if (!map.contains(getSquare(x,c))) map.add(new Square(x,c,false, false));
 			if (!map.contains(getSquare(x,d))) map.add(new Square(x,d,false, false));
 			if (!map.contains(getSquare(a,y))) map.add(new Square(a,y,false, false));
@@ -120,7 +120,7 @@ public class Student2 extends Agent {
 			if (!map.contains(getSquare(b,c))) map.add(new Square(b,c,false, false));
 			if (!map.contains(getSquare(b,d))) map.add(new Square(b,d,false, false));
 			
-			//Checks to see if the squares around Roomba are obstacles.  If they are,
+			//Checks to see if the squares around Agent are obstacles.  If they are,
 			//sets those squares to be obstacles.
 			if ((s[dirs[0].ordinal()] == Room.WALL))
 				{
@@ -156,8 +156,8 @@ public class Student2 extends Agent {
 				}
 			
 			if(returnHome == false){
-				//Checks to see if the Roomba is surrounded by visited squares and
-				//obsticles.  If it is, it will backtrack its last square.	
+				//Checks to see if the Agent is surrounded by visited squares and
+				//obsticles.  
 				if((getSquare(x,c).wasVisited() || getSquare(x,c).isObstacle()) && 
 						(getSquare(x,d).wasVisited()|| getSquare(x,d).isObstacle()) && 
 						(getSquare(a,y).wasVisited()|| getSquare(a,y).isObstacle()) && 
@@ -170,7 +170,7 @@ public class Student2 extends Agent {
 
 					Square notVisitedSquare = null;
 					for(int i=0; i< map.size();i++){
-						if(!map.get(i).wasVisited()){
+						if(!map.get(i).wasVisited() && !map.get(i).isObstacle()){
 							notVisitedSquare = map.get(i);
 						}
 					}
@@ -183,13 +183,15 @@ public class Student2 extends Agent {
 					
 					x = x+goDirection.getXModifier();
 					y = y+goDirection.getYModifier();
-					
+					getSquare(x,y).setToVisit();
+					history.add(goDirection);
+					pickOne = generator.nextInt(7);
 					return goDirection;
 
 				}
 
 			else {	
-				//Randomly picks a square that the Roomba has not visited yet and goes there.
+				//Randomly picks a square that the Agent has not visited yet and goes there.
 				//Also changes the square to Visited.
 				while(true){
 					for(int i=0; i<dirs.length -1; i++){
@@ -309,7 +311,7 @@ public class Student2 extends Agent {
 		}
 	}		
 
-	//Resets the Roomba's values.
+	//Resets the Agent's values.
 	public void reset()
 	{
 		x = 0;
@@ -329,7 +331,7 @@ public class Student2 extends Agent {
 		counterForHome =0;
 		returnHome = false;
 		hasComputer = false;
-		ArrayList<Square> pathToHome = null;
+	    pathToHome = null;
 		
 		iAmDone = false;
 	}

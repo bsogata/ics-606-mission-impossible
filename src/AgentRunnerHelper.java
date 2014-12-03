@@ -19,7 +19,7 @@ public static ArrayList<Agent>  makeAgents(){
 	
 	
 	for(int i =0; i<10; i++){
-		studentList.add(new Student(i, 1, "a"));
+		studentList.add(new Student2(i, 1, "a"));
 	  }
 	
 	return studentList;
