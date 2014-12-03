@@ -68,8 +68,8 @@ class Square
 		isVisited = true;
 	}	
 	
-	//Sets isObsticle value to true.
-	public void setToObsticle()
+	//Sets isObstacle value to true.
+	public void setToObstacle()
 	{
 		isObstacle = true;
 	}  

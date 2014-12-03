@@ -10,8 +10,7 @@ import java.util.Random;
  * A Student agent that will only visit non-visited cells. If all surrounded cells are visited,
  * use A* search to find the first non-visited cell. (Stack-like fashion)
  * 
- * BUG: will infinite loop the agent at times and not do anything useful.
- * 
+ *  
  * @author Jack
  *
  */
@@ -87,13 +86,17 @@ public class Student2 extends Agent {
 				}
 				 ArrayList<Square> temp = receiveMessages.getMessages().get(i).getMap();
 				 if(temp != null){
-					 boolean addToMap = true;
 					 for(int j=0;j<temp.size(); j++){
+						 boolean addToMap = true;
 						 for(int k=0; k<map.size(); k++){
 							 //check if I already have this in my map
 							 //if((map.get(k).getX() == temp.get(j).getX()) && map.get(k).getY() == temp.get(j).getY()){
 							 if(map.get(k).equals(temp.get(j))){
 							 	addToMap = false;
+							 	//I already have it in my map. update my own map though if it got visited.
+							 	if((temp.get(j).wasVisited() == true) && (map.get(k).wasVisited() == false)){
+							 		map.get(k).setToVisit();
+							 	}
 								 break;
 							 }
 						 }
@@ -124,35 +127,35 @@ public class Student2 extends Agent {
 			//sets those squares to be obstacles.
 			if ((s[dirs[0].ordinal()] == Room.WALL))
 				{
-					getSquare(x,d).setToObsticle();
+					getSquare(x,d).setToObstacle();
 				}
 			if ((s[dirs[1].ordinal()] == Room.WALL))
 				{
-					getSquare(a,d).setToObsticle();
+					getSquare(a,d).setToObstacle();
 				}
 			if ((s[dirs[2].ordinal()] == Room.WALL) )
 				{
-					getSquare(a,y).setToObsticle();
+					getSquare(a,y).setToObstacle();
 				}
 			if ((s[dirs[3].ordinal()] == Room.WALL) )
 				{
-					getSquare(a,c).setToObsticle();
+					getSquare(a,c).setToObstacle();
 				}
 			if ((s[dirs[4].ordinal()] == Room.WALL) )
 				{
-					getSquare(x,c).setToObsticle();
+					getSquare(x,c).setToObstacle();
 				}
 			if ((s[dirs[5].ordinal()] == Room.WALL) )
 				{
-					getSquare(b,c).setToObsticle();
+					getSquare(b,c).setToObstacle();
 				}
 			if ((s[dirs[6].ordinal()] == Room.WALL) )
 				{
-					getSquare(b,y).setToObsticle();
+					getSquare(b,y).setToObstacle();
 				}
 			if ((s[dirs[7].ordinal()] == Room.WALL) )
 				{
-					getSquare(b,d).setToObsticle();
+					getSquare(b,d).setToObstacle();
 				}
 			
 			if(returnHome == false){
@@ -175,6 +178,9 @@ public class Student2 extends Agent {
 						}
 					}
 					
+					if(notVisitedSquare == null){
+						return Direction.HERE;
+					}
 					ArrayList<Square> closestNonVisited = aStarSearch(getCurrentSquare(), notVisitedSquare);
 					
 					Square goToSquare = closestNonVisited.get(0);
@@ -185,7 +191,6 @@ public class Student2 extends Agent {
 					y = y+goDirection.getYModifier();
 					getSquare(x,y).setToVisit();
 					history.add(goDirection);
-					pickOne = generator.nextInt(7);
 					return goDirection;
 
 				}

@@ -7,19 +7,16 @@ import java.util.Random;
 
 
 /**
- * A Student agent that will only visit non-visited cells. Backtrack if there are cells that are
- * visited.
+ * A Student agent that will only visit non-visited cells. If all surrounded cells are visited,
+ * use A* search to find the closest non-visited cell.
  * 
- * Note that there is actually a bug in the agents not updating their maps.
- * However, because this is a backtrack algorithm, we don't want them update
- * their maps to visited squares because they'll backtrack and then do absolutely nothing
- * while one agent does all the work.
- * 
+ *  BUG - Agents may sometimes infinite loop the same cells.
+ *  Possibly tie-breaker issue.
  * @author Jack
  *
  */
 
-public class Student extends Agent {
+public class Student3 extends Agent {
 	private boolean hasComputer;
 	 private ArrayList<Square> map = new ArrayList<Square>();
 		private int x=0;
@@ -45,8 +42,6 @@ public class Student extends Agent {
 		private int counterForHome = 0;
 		
 		private boolean iAmDone;
-		
-
 	
   /**
    * Creates a Student agent.
@@ -56,7 +51,7 @@ public class Student extends Agent {
    * 
    */
   
-  public Student(int id,int teamid, String name) {
+  public Student3(int id,int teamid, String name) {
     super(id,teamid, name);
   }
    
@@ -81,9 +76,6 @@ public class Student extends Agent {
 				break;
 			}
 		}
-		
-		
-	
 			
 			//Synchronize map with new information from agents
 			for(int i=0;i<receiveMessages.getMessages().size(); i++){
@@ -99,11 +91,9 @@ public class Student extends Agent {
 							 if(map.get(k).equals(temp.get(j))){
 							 	addToMap = false;
 							 	//I already have it in my map. update my own map though if it got visited.
-							 	
-							 	//TO FIX BUG, UNCOMMENT THIS SECTION
-							 	//if((temp.get(j).wasVisited() == true) && (map.get(k).wasVisited() == false)){
-							 	//	map.get(k).setToVisit();
-							 	//}
+							 	if((temp.get(j).wasVisited() == true) && (map.get(k).wasVisited() == false)){
+							 		map.get(k).setToVisit();
+							 	}
 								 break;
 							 }
 						 }
@@ -167,7 +157,7 @@ public class Student extends Agent {
 			
 			if(returnHome == false){
 				//Checks to see if the Agent is surrounded by visited squares and
-				//obsticles.  If it is, it will backtrack its last square.	
+				//Obstacles.  
 				if((getSquare(x,c).wasVisited() || getSquare(x,c).isObstacle()) && 
 						(getSquare(x,d).wasVisited()|| getSquare(x,d).isObstacle()) && 
 						(getSquare(a,y).wasVisited()|| getSquare(a,y).isObstacle()) && 
@@ -178,15 +168,48 @@ public class Student extends Agent {
 						(getSquare(b,d).wasVisited()|| getSquare(b,d).isObstacle())) {			
 
 
-					if(history.size() == 0){
+					Square notVisitedSquare = null;
+					for(int i=0; i< map.size();i++){
+						if(!map.get(i).wasVisited() && !map.get(i).isObstacle()){
+							if(notVisitedSquare == null){
+								notVisitedSquare = map.get(i);
+							}
+							else{
+								//Find distance to see which not visited square is closer
+								
+								int tempFirstX = notVisitedSquare.getX();
+								int tempFirstY = notVisitedSquare.getY();
+								
+								int tempSecondX = map.get(i).getX();
+								int tempSecondY = map.get(i).getY();
+								
+								//int distanceFirst = Math.max(Math.abs(tempFirstX - x), Math.abs(tempFirstY - y));
+								//int distanceSecond = Math.max(Math.abs(tempSecondX -x), Math.abs(tempSecondY - y));
+								
+								double distanceFirst = Math.sqrt(Math.pow(tempFirstX -x, 2) + Math.pow(tempFirstY - y,2));
+								double distanceSecond = Math.sqrt(Math.pow(tempSecondX -x, 2) + Math.pow(tempSecondY - y,2));
+								//Compare the two, if second is smaller, reassign.
+								if(distanceSecond < distanceFirst){
+									notVisitedSquare = map.get(i);
+								}
+							}
+						}
+					}
+					
+					if(notVisitedSquare == null){
 						return Direction.HERE;
 					}
-					lastMove = history.get(history.size()-1).reverse();
-					history.remove(history.size()-1);
-					x = x+lastMove.getXModifier();
-					y = y+lastMove.getYModifier();
+					ArrayList<Square> closestNonVisited = aStarSearch(getCurrentSquare(), notVisitedSquare);
+					
+					Square goToSquare = closestNonVisited.get(0);
+					
+					Direction goDirection = directionGivenSquare(x, y, goToSquare);
+					
+					x = x+goDirection.getXModifier();
+					y = y+goDirection.getYModifier();
 					getSquare(x,y).setToVisit();
-					return lastMove;
+					history.add(goDirection);
+					return goDirection;
 
 				}
 
@@ -227,12 +250,9 @@ public class Student extends Agent {
 			}
 		}
 		else{ //Perform A* search to return home
-			//Square currentLocation = getCurrentSquare();
 			
 			Square currentLocation = new Square(x,y, false, false);
-			//int col = currentLocation.getX();
-			//int row = currentLocation.getY();
-			
+	
 			int col = x;
 			int row = y;
 
@@ -334,10 +354,7 @@ public class Student extends Agent {
 		counterForHome =0;
 		returnHome = false;
 		hasComputer = false;
-		pathToHome = null;
-		
-		 sendMessage = null;
-		 receiveMessages = null;
+	    pathToHome = null;
 		
 		iAmDone = false;
 	}
@@ -389,13 +406,9 @@ public class Student extends Agent {
  		Square q;
  		openSet.add(start);
  		
- 		if(openSet.isEmpty()){
- 			System.out.println("openset is eempty!!!");
- 		}
  		
 		while (!openSet.isEmpty() && foundGoal == false) {
-			
-		
+				
 			// find smallest f in openset
 			int tempi = 0;
 			q = openSet.get(0);
@@ -499,14 +512,7 @@ public class Student extends Agent {
 				if(doNothing == false){
 					successors.get(i).setParent(q);
 					openSet.add(successors.get(i));
-				}
-				
-				
-		
-				
-		
-			
-				
+				}		
 				
 			}
 			//done. Push q to closed list
@@ -541,10 +547,57 @@ public class Student extends Agent {
 		return pathToGoal;
  	}
  	  
+
+ 	private Direction directionGivenSquare(int x, int y, Square goal){
+ 		Direction nextMove;
+ 		int nextCol = goal.getX();
+		int nextRow = goal.getY();
+ 		int northOrSouth = y - nextRow;
+		int westOrEast = x - nextCol;
+
+		
+		if(northOrSouth > 0){ //Go North
+			if(westOrEast < 0){ //Go East
+				nextMove = Direction.NE; 
+			}
+			else if(westOrEast > 0){//Go west
+				nextMove = Direction.NW;
+			}
+			else{ //just go north
+				nextMove = Direction.N;
+			}
+		}
+		else if (northOrSouth < 0){ //South
+			if(westOrEast < 0){ //Go East
+				nextMove = Direction.SE; 
+			}
+			else if(westOrEast > 0){//Go west
+				nextMove = Direction.SW;
+			}
+			else{ //just go south
+				nextMove = Direction.S;
+			}
+		}
+		else{ //Don't go north or south
+			if(westOrEast < 0){ //Go East
+				nextMove = Direction.E; 
+			}
+			else if(westOrEast > 0){//Go west
+				nextMove = Direction.W;
+			}
+			else{
+				nextMove = Direction.HERE;
+			}
+		}
+		
+		return nextMove;
+ 	}
+
+
 	public boolean getiAmDone() {
 		return iAmDone;
 	}
  
- 
+ 	
   }
 
