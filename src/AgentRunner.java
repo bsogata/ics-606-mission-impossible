@@ -49,6 +49,10 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	  private JMenuItem load;
 	  private JMenuItem quit;
 	  private File roomFile;
+	  private JLabel iterationCounter;
+	  
+	  private int iteration;
+	  
 	public static void main(String[] args) {
 
 		// start up GUI
@@ -64,6 +68,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	 public AgentRunner() {
 		 
 		 studentList = AgentRunnerHelper.makeAgents();
+		 this.iteration = 0;
 		 
 		    //create a window
 		    this.window = new JFrame("GUI Agent Runner");
@@ -111,7 +116,13 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    buttonHolder.setBorder(margin);
 		    rightPane.add(buttonHolder);
 
+        // The iteration counter
+        this.iterationCounter = new JLabel();
+        this.iterationCounter.setText(String.format("Current Iteration: %d", this.iteration));
+        this.rightPane.add(this.iterationCounter);
+
 		    window.add(rightPane, BorderLayout.EAST);
+		    
 		    //done with panes
 
 		    //add a MENU
@@ -202,6 +213,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 		    	}
 		    //  while (room.moveAgent()) {
 		     while (room.moveAgents()) {
+		       this.updateIterationCounter();
 		        roomGUI.update();  //update the display after moving
 		        try {
 		          if (this.animationDelay > 0) {
@@ -286,4 +298,15 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	    
 	
 }
+	
+	/**
+	 * Increments the iteration counter.
+	 * 
+	 */
+	
+	public void updateIterationCounter()
+	{
+	  this.iteration++;
+	  this.iterationCounter.setText(String.format("Current Iteration: %d", this.iteration));
+	}
 }
