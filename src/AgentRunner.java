@@ -184,6 +184,7 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	      if (this.goButton.getText().equals("Again!")) {
 	        //repeating current room, so need to refresh it first
 	        this.refreshRoom();
+	        this.iteration = 0;
 	      }
 	      //disable goButton and loading of new map until done cleaning
 	      this.goButton.setEnabled(false);
