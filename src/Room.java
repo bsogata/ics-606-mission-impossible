@@ -344,6 +344,25 @@ public class Room {
 				//valid move, so return below
 			}
 		}
+		
+		//Check if this cell actually has more than one student.. if it does, use a number to represent the stack
+		for(int i =0; i<agentInfoList.size(); i++){
+			int stack = 1;
+			for(int j=0; j< agentInfoList.size(); j++){
+				if(i != j &&agentInfoList.get(j).getRow() == agentInfoList.get(i).getRow() && agentInfoList.get(j).getCol() == agentInfoList.get(i).getCol()){
+					stack++;
+				}
+			}
+			if(stack >1){
+				if(stack >9){//stack is 10 or higher, can't print one character, use a different symbol instead
+					this.room[agentInfoList.get(i).getRow()][agentInfoList.get(i).getCol()] = 'T';
+
+				}
+				else{
+					this.room[agentInfoList.get(i).getRow()][agentInfoList.get(i).getCol()] = Character.forDigit(stack, 10);
+				}
+			}
+		}
 
 		for(int j =0; j<agents.size(); j++){
 			if(!agents.get(j).getiAmDone()){

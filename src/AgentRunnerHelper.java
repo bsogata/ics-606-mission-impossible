@@ -18,10 +18,17 @@ public static ArrayList<Agent>  makeAgents(){
 	ArrayList<Agent> studentList = new ArrayList<Agent>();
 	
 	
-	for(int i =0; i<10; i++){
-		studentList.add(new Student3(i, 1, "a"));
-	  }
+	//for(int i =0; i<5; i++){
+	//	studentList.add(new Student3(i, 1, "a"));
+	//  }
 	
+	for(int i =0; i<5;i++){
+		studentList.add(new Student2(i,1,"b"));
+	}
+	
+	for(int i=0; i< 5; i++){
+		studentList.add(new Student(i,1,"c"));
+	}
 	return studentList;
 }
 	  
