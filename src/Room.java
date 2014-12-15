@@ -439,6 +439,7 @@ public class Room {
 		    return this.done;
 		  }
 
+
 /**
  * An enumeration of the various possible outcomes of a agent
  * cleaning a room.

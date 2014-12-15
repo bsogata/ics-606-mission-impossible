@@ -207,7 +207,7 @@ public class Student extends Agent {
 					}
 					
 				 	pickOne = generator.nextInt(8);
-					
+
 					if ((s[dirs[pickOne].ordinal()] != Room.WALL))
 					{
 						 r = x+dirs[pickOne].getXModifier();

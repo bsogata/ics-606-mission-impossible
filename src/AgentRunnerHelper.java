@@ -18,16 +18,16 @@ public static ArrayList<Agent>  makeAgents(){
 	ArrayList<Agent> studentList = new ArrayList<Agent>();
 	
 	
-	//for(int i =0; i<5; i++){
-	//	studentList.add(new Student3(i, 1, "a"));
-	//  }
+	for(int i =0; i<3; i++){
+		studentList.add(new Student3(i, 1, "c"));
+	}
 	
-	for(int i =0; i<5;i++){
+	for(int i =0; i<3;i++){
 		studentList.add(new Student2(i,1,"b"));
 	}
 	
-	for(int i=0; i< 5; i++){
-		studentList.add(new Student(i,1,"c"));
+	for(int i=0; i< 3; i++){
+		studentList.add(new Student(i,1,"a"));
 	}
 	return studentList;
 }

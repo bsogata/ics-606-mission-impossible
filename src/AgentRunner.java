@@ -15,6 +15,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -22,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -51,14 +54,39 @@ public class AgentRunner implements ActionListener, ChangeListener {
 	  private File roomFile;
 	  private JLabel iterationCounter;
 	  
-	  private int iteration;
+	  private static int iteration;
 	  
-	public static void main(String[] args) {
+	  public static void main(String[] args) {
 
-		// start up GUI
-		new AgentRunner();
+		  // start up GUI
+		  if(args.length == 0){
+			  new AgentRunner();
+		  }
+		  //one Argument for silent mode
+		  else if (args.length == 1){
+			  studentList = AgentRunnerHelper.makeAgents();
+			  iteration = 0;
+			  try {
+				  Room r = new Room(args[0], studentList);
+				  for(Agent student : studentList){
+					  student.reset();
+				  }
+				  while (r.moveAgents()) {
+					  iteration++;
+				  }
+				  System.out.println(iteration);
+			  }catch (FileNotFoundException fnfe) {
+				  System.out.println("Could not open file: " + fnfe.getMessage());
+			  }catch (InvalidMapException ime) {
+				  System.out.println("File did not contain a valid map: " + ime.getMessage());
+			  }
+		  }
+		  else{
+			  System.out.println("No arguments for GUI, one argument for map for silent mode");
+			  System.out.println("Usage: java AgentRunner roomfile");
+		  }
 
-	}
+	  }
 
 	/**
 	 * Creates the GUI for this application.
